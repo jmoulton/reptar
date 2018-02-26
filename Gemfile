@@ -6,6 +6,7 @@ gem 'sinatra'
 gem 'dotenv'
 gem 'celluloid-io'
 gem 'foreman'
+gem 'google-api-client'
 
 group :development, :test do
   gem 'rake'
