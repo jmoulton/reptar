@@ -7,6 +7,7 @@ gem 'dotenv'
 gem 'celluloid-io'
 gem 'foreman'
 gem 'google-api-client'
+gem 'pry'
 
 group :development, :test do
   gem 'rake'
