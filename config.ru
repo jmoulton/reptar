@@ -5,6 +5,7 @@ require 'slack-ruby-bot'
 Dotenv.load
 
 require 'compliment-bot'
+require 'calendar-bot'
 require 'web'
 
 Thread.abort_on_exception = true
@@ -12,6 +13,7 @@ Thread.abort_on_exception = true
 Thread.new do
   begin
     ComplimentBot::Bot.run
+    CalendarBot::Bot.run
   rescue Exception => e
     STDERR.puts "ERROR: #{e}"
     STDERR.puts e.backtrace
