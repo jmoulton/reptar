@@ -10,11 +10,10 @@ class GoogleCalendar
   OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
   APPLICATION_NAME = 'Google Calendar API Ruby Quickstart'
   CLIENT_SECRETS_PATH = 'client_secret.json'
-  CREDENTIALS_PATH = File.join(Dir.home, '.credentials',
-                               "calendar-ruby-quickstart.yaml")
   SCOPE = Google::Apis::CalendarV3::AUTH_CALENDAR_READONLY
 
-  def initialize
+  def initialize(user)
+    @user = user
     @service = Google::Apis::CalendarV3::CalendarService.new
     @service.client_options.application_name = APPLICATION_NAME
   end
@@ -26,10 +25,10 @@ class GoogleCalendar
   ##
   ## @return [Google::Auth::UserRefreshCredentials] OAuth2 credentials
   def authorize
-    FileUtils.mkdir_p(File.dirname(CREDENTIALS_PATH))
+    FileUtils.mkdir_p(File.dirname(user_credential_path))
 
     client_id = Google::Auth::ClientId.from_file(CLIENT_SECRETS_PATH)
-    token_store = Google::Auth::Stores::FileTokenStore.new(file: CREDENTIALS_PATH)
+    token_store = Google::Auth::Stores::FileTokenStore.new(file: user_credential_path)
     authorizer = Google::Auth::UserAuthorizer.new(
       client_id, SCOPE, token_store)
     user_id = 'default'
@@ -41,10 +40,10 @@ class GoogleCalendar
   end
 
   def authorize_me!
-    FileUtils.mkdir_p(File.dirname(CREDENTIALS_PATH))
+    FileUtils.mkdir_p(File.dirname(user_credential_path))
 
     client_id = Google::Auth::ClientId.from_file(CLIENT_SECRETS_PATH)
-    token_store = Google::Auth::Stores::FileTokenStore.new(file: CREDENTIALS_PATH)
+    token_store = Google::Auth::Stores::FileTokenStore.new(file: user_credential_path)
     authorizer = Google::Auth::UserAuthorizer.new(
       client_id, SCOPE, token_store)
     user_id = 'default'
@@ -63,7 +62,7 @@ class GoogleCalendar
 
   def send_code(code)
     client_id = Google::Auth::ClientId.from_file(CLIENT_SECRETS_PATH)
-    token_store = Google::Auth::Stores::FileTokenStore.new(file: CREDENTIALS_PATH)
+    token_store = Google::Auth::Stores::FileTokenStore.new(file: user_credential_path)
     authorizer = Google::Auth::UserAuthorizer.new(
       client_id, SCOPE, token_store)
     user_id = 'default'
@@ -90,5 +89,11 @@ class GoogleCalendar
     end
 
     return str
+  end
+
+  private
+
+  def user_credential_path
+    @path ||= File.join(Dir.home, '.credentials', "#{@user}_credentials.yaml")
   end
 end
