@@ -11,7 +11,7 @@ class GoogleAuthorizer
   APPLICATION_NAME = 'Google Calendar API Ruby Quickstart'
   CLIENT_SECRETS_PATH = 'client_secret.json'
   SCOPE = [Google::Apis::CalendarV3::AUTH_CALENDAR_READONLY,
-           Google::Apis::AdminDirectoryV1::AUTH_ADMIN_DIRECTORY_CUSTOMER_READONLY]
+           Google::Apis::AdminDirectoryV1::AUTH_ADMIN_DIRECTORY_RESOURCE_CALENDAR]
 
   def initialize(user)
    @user = user

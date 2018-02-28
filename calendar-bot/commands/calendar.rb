@@ -33,13 +33,17 @@ module CalendarBot
         text = ":yodawg: Looks like your next event is: #{events}"
         client.say(channel: data.channel, text: text)
       rescue AuthorizationError
-        text = "Oops! Looks like you're not authenticated. Try telling me: 'authorize me!'"
+        text = "Oops! Looks like you're not authenticated. Try telling me: \"authorize me!\""
         client.say(channel: data.channel, text: text)
       end
     end
 
     command 'list rooms' do |client, data, _match|
-      GoogleServices.new(data['user'])
+      service = GoogleServices.new(data['user'])
+      service.authorize
+      rooms = service.find_rooms
+
+      client.say(channel: data.channel, text: rooms)
     end
 
     match /\d{1}\/.+/ do |client, data, _match|

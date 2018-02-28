@@ -26,4 +26,16 @@ class GoogleServices
     credentials = authorizer.send(code)
     @service.authorization = credentials
   end
+
+  def find_rooms
+    rooms = @service.list_calendar_resources('my_customer')
+
+    names = rooms.items.map { |r| r.resource_name }
+  end
+
+  private
+
+  def authorizer
+    @authorizer ||= GoogleAuthorizer.new(@user)
+  end
 end
