@@ -1,5 +1,5 @@
-class GoogleCalendar
-  require 'google/apis/calendar_v3'
+class GoogleAuthorizer
+  require 'google/apis/admin_directory_v1'
   require 'googleauth'
   require 'googleauth/stores/file_token_store'
   require 'calendar-bot/commands/calendar'
@@ -10,12 +10,11 @@ class GoogleCalendar
   OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
   APPLICATION_NAME = 'Google Calendar API Ruby Quickstart'
   CLIENT_SECRETS_PATH = 'client_secret.json'
-  SCOPE = Google::Apis::CalendarV3::AUTH_CALENDAR_READONLY
+  SCOPE = [Google::Apis::CalendarV3::AUTH_CALENDAR_READONLY,
+           Google::Apis::AdminDirectoryV1::AUTH_ADMIN_DIRECTORY_CUSTOMER_READONLY]
 
   def initialize(user)
-    @user = user
-    @service = Google::Apis::CalendarV3::CalendarService.new
-    @service.client_options.application_name = APPLICATION_NAME
+   @user = user
   end
 
   ##
@@ -36,7 +35,8 @@ class GoogleCalendar
     if @credentials.nil? || @credentials.expired?
       raise CalendarBot::AuthorizationError
     end
-    @service.authorization = @credentials
+
+    @credentials
   end
 
   def authorize_me!
@@ -70,25 +70,7 @@ class GoogleCalendar
     @credentials = authorizer.get_and_store_credentials_from_code(
       user_id: user_id, code: code, base_url: OOB_URI)
 
-    @service.authorization = @credentials
-  end
-
-  def fetch_most_recent_events(count = 10)
-    calendar_id = 'primary'
-    response = @service.list_events(calendar_id,
-                                   max_results: count,
-                                   single_events: true,
-                                   order_by: 'startTime',
-                                   time_min: Time.now.iso8601)
-
-    return "No upcoming events found" if response.items.empty?
-    str = "";
-    response.items.each do |event|
-      start = event.start.date || event.start.date_time
-      str = str + "- #{event.summary} (#{start})\n"
-    end
-
-    return str
+    @credentials
   end
 
   private
