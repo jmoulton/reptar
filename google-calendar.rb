@@ -37,7 +37,8 @@ class GoogleCalendar
     str = "";
     response.items.each do |event|
       start = event.start.date || event.start.date_time
-      str = str + "- #{event.summary} (#{start})\n"
+      start = start.strftime('at %I:%M%p on %m/%d/%Y')
+      str = str + " _#{event.summary}_ #{start}\n"
     end
 
     return str

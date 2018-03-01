@@ -1,6 +1,7 @@
 class GoogleServices
   require 'google/apis/admin_directory_v1'
   require 'google-authorizer'
+  require 'room'
   require 'pry'
 
   require 'fileutils'
@@ -27,10 +28,17 @@ class GoogleServices
     @service.authorization = credentials
   end
 
-  def find_rooms
-    rooms = @service.list_calendar_resources('my_customer')
+  def find_rooms(options = {})
+    rooms = Room.new(@service.list_calendar_resources('my_customer').items)
 
-    names = rooms.items.map { |r| r.resource_name }
+    if options[:on].present?
+      case options[:on]
+      when '24'
+        return rooms.on_twenty_four
+      when '27'
+        return rooms.on_twenty_seven
+      end
+    end
   end
 
   private

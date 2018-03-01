@@ -4,18 +4,6 @@ require 'google-services'
 
 module CalendarBot
   class Calendar < SlackRubyBot::Commands::Base
-    command 'list my calendar events' do |client, data, _match|
-      begin
-        calendar = self.calendar(data['user'])
-        calendar.authorize
-
-        events = calendar.fetch_most_recent_events
-        client.say(channel: data.channel, text: events)
-      rescue AuthorizationError
-        text = "Oops! Looks like you're not authenticated. Try telling me: \"authorize me!\""
-        client.say(channel: data.channel, text: text)
-      end
-    end
 
     command 'authorize me!' do |client, data, _match|
       calendar = self.calendar(data['user'])
@@ -24,27 +12,46 @@ module CalendarBot
       client.say(channel: data.channel, text: url)
     end
 
+    command 'list my calendar events' do |client, data, _match|
+      with_auth(client, data) do
+        calendar = self.calendar(data['user'])
+        calendar.authorize
+
+        events = calendar.fetch_most_recent_events
+        client.say(channel: data.channel, text: events)
+      end
+    end
+
     command "what's my next event?" do |client, data, _match|
-      begin
+      with_auth(client, data) do
         calendar = self.calendar(data['user'])
         calendar.authorize
 
         events = calendar.fetch_most_recent_events(1)
         text = ":yodawg: Looks like your next event is: #{events}"
         client.say(channel: data.channel, text: text)
-      rescue AuthorizationError
-        text = "Oops! Looks like you're not authenticated. Try telling me: \"authorize me!\""
-        client.say(channel: data.channel, text: text)
       end
     end
 
-    command 'list rooms' do |client, data, _match|
-      service = GoogleServices.new(data['user'])
-      service.authorize
-      rooms = service.find_rooms
+    command /list rooms/,
+      /list rooms on 24/,
+      /list rooms on 27/,
+      /list open rooms on 24/,
+      /list open rooms on 27/  do |client, data, match|
+        with_auth(client, data) do
+          service = GoogleServices.new(data['user'])
+          service.authorize
 
-      client.say(channel: data.channel, text: rooms)
-    end
+          opts = {}
+          command = match.to_s
+          opts.merge!(on: '24') if /24/.match(command).present?
+          opts.merge!(on: '27') if /27/.match(command).present?
+
+          rooms = service.find_rooms(opts)
+
+          client.say(channel: data.channel, text: rooms)
+        end
+      end
 
     match /\d{1}\/.+/ do |client, data, _match|
       calendar(data['user']).send_code(data["text"])
@@ -54,6 +61,16 @@ module CalendarBot
 
     def self.calendar(user)
       GoogleCalendar.new(user)
+    end
+
+    private
+
+    def self.with_auth(client, data)
+      yield
+
+    rescue AuthorizationError
+      text = "Oops! Looks like you're not authenticated. Try telling me: \"authorize me!\""
+      client.say(channel: data.channel, text: text)
     end
   end
 
