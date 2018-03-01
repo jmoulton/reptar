@@ -90,6 +90,10 @@ module CalendarBot
      client.say(channel: data.channel, text: text)
    end
 
+   command 'who is reptar?' do |client, data, _match|
+     client.say(channel: data.channel, text: "https://www.youtube.com/watch?v=kLCmiVs_j7Y")
+   end
+
     match /\d{1}\/.+/ do |client, data, _match|
       calendar(data['user']).send_code(data["text"])
 
