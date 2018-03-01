@@ -41,10 +41,12 @@ class GoogleCalendar
     str = "";
     events.each do |event|
       start = event.start.date || event.start.date_time
-      start = start.strftime('at %I:%M%p on %m/%d/%Y')
+      start = start.strftime('from %I:%M%p to ')
+      end_time = event.end.date || event.end.date_time
+      end_time = end_time.strftime('%I:%M%p on %m/%d/%Y')
 
       summary = event.summary.present? ? event.summary : 'Meeting'
-      str = str + "> *#{summary}* #{start}\n"
+      str = str + "> *#{summary}* #{start}#{end_time}\n"
     end
 
     return str

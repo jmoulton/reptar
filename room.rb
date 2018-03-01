@@ -37,8 +37,8 @@ class Room
     events = room_events(room.resource_email)
     room = events.first
 
-    room.start.date_time < Time.now &&
-      Time.now > room.end.date_time
+    room.start.date_time.to_time.utc < (Time.now + 3.hours).utc &&
+      (Time.now + 3.hours).utc < room.end.date_time.to_time.utc
   end
 
   def find_room(emoji)
