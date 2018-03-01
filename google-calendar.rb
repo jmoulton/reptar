@@ -25,8 +25,7 @@ class GoogleCalendar
     @service.authorization = credentials
   end
 
-  def fetch_most_recent_events(count = 10)
-    calendar_id = 'primary'
+  def fetch_most_recent_events(count = 10, calendar_id = 'primary')
     response = @service.list_events(calendar_id,
                                    max_results: count,
                                    single_events: true,
@@ -34,11 +33,18 @@ class GoogleCalendar
                                    time_min: Time.now.iso8601)
 
     return "No upcoming events found" if response.items.empty?
+
+    return response.items
+  end
+
+  def format!(events)
     str = "";
-    response.items.each do |event|
+    events.each do |event|
       start = event.start.date || event.start.date_time
       start = start.strftime('at %I:%M%p on %m/%d/%Y')
-      str = str + " _#{event.summary}_ #{start}\n"
+
+      summary = event.summary.present? ? event.summary : 'Meeting'
+      str = str + "- #{summary} #{start}\n"
     end
 
     return str

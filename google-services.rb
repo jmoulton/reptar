@@ -28,8 +28,21 @@ class GoogleServices
     @service.authorization = credentials
   end
 
+  def room_available?(emoji)
+    rooms = Room.new(@service.list_calendar_resources('my_customer').items, @user)
+
+    !rooms.room_occupied?(emoji)
+  end
+
+  def room_events(emoji)
+    rooms = Room.new(@service.list_calendar_resources('my_customer').items, @user)
+
+    room = rooms.find_room(emoji)
+    rooms.room_events(room.resource_email)
+  end
+
   def find_rooms(options = {})
-    rooms = Room.new(@service.list_calendar_resources('my_customer').items)
+    rooms = Room.new(@service.list_calendar_resources('my_customer').items, @user)
 
     if options[:on].present?
       case options[:on]
@@ -39,6 +52,8 @@ class GoogleServices
         return rooms.on_twenty_seven
       end
     end
+
+    rooms
   end
 
   private

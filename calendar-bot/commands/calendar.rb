@@ -18,6 +18,8 @@ module CalendarBot
         calendar.authorize
 
         events = calendar.fetch_most_recent_events
+        events = calendar.format!(events)
+
         client.say(channel: data.channel, text: events)
       end
     end
@@ -28,6 +30,8 @@ module CalendarBot
         calendar.authorize
 
         events = calendar.fetch_most_recent_events(1)
+        events = calendar.format!(events)
+
         text = ":yodawg: Looks like your next event is: #{events}"
         client.say(channel: data.channel, text: text)
       end
@@ -51,7 +55,40 @@ module CalendarBot
 
           client.say(channel: data.channel, text: rooms)
         end
-      end
+    end
+
+   command /is\s\:.+\:\savailable\?/ do |client, data, match|
+     with_auth(client, data) do
+        service = GoogleServices.new(data['user'])
+        service.authorize
+
+        emoji = match.to_s.scan(/\:.+\:/).first
+        available = service.room_available?(emoji)
+
+        if available
+          text = ":ohyeah: looks like that room is free! :dancing:"
+        else
+          binding.pry
+          events = calendar(data['user']).format!(service.room_events(emoji))
+          text = "Bummer man! Looks like it's booked. Here are the upcoming events:\n#{events}"
+        end
+
+        client.say(channel: data.channel, text: text)
+     end
+   end
+
+   command /list events in \:.+\:/ do |client, data, match|
+     service = GoogleServices.new(data['user'])
+     service.authorize
+
+     emoji = match.to_s.scan(/\:.+\:/).first
+
+     events = calendar(data['user']).format!(service.room_events(emoji))
+
+     text = ":ohmy: here are the upcoming event times in #{emoji}\n#{events}"
+
+     client.say(channel: data.channel, text: text)
+   end
 
     match /\d{1}\/.+/ do |client, data, _match|
       calendar(data['user']).send_code(data["text"])
