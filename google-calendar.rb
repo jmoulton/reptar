@@ -44,7 +44,7 @@ class GoogleCalendar
       start = start.strftime('at %I:%M%p on %m/%d/%Y')
 
       summary = event.summary.present? ? event.summary : 'Meeting'
-      str = str + "- #{summary} #{start}\n"
+      str = str + "> *#{summary}* #{start}\n"
     end
 
     return str

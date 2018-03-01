@@ -32,7 +32,7 @@ module CalendarBot
         events = calendar.fetch_most_recent_events(1)
         events = calendar.format!(events)
 
-        text = ":yodawg: Looks like your next event is: #{events}"
+        text = ":yodawg: Looks like your next event is:\n#{events}"
         client.say(channel: data.channel, text: text)
       end
     end
