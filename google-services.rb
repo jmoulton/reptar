@@ -54,6 +54,7 @@ class GoogleServices
     end
 
     rooms.by_name
+    rooms.stripped_floor
   end
 
   private

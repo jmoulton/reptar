@@ -1,6 +1,7 @@
 require 'google-calendar'
 require 'google-authorizer'
 require 'google-services'
+require 'constants'
 
 module CalendarBot
   class Calendar < SlackRubyBot::Commands::Base
@@ -49,7 +50,9 @@ module CalendarBot
         opts[:on] = '27' if /27/.match(command).present?
         rooms = service.find_rooms(opts)
 
-        client.say(channel: data.channel, text: rooms)
+        text = "#{Constants::ROOMS.sample(1).first}\n#{rooms.join("\n")}"
+
+        client.say(channel: data.channel, text: text)
       end
     end
 

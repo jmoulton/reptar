@@ -52,7 +52,7 @@ class Room
   end
 
   def stripped_floor
-    @rooms.each { |r| r[0..2] = '' }
+    @rooms.each { |r| r[0..2] = '>' }
   end
 
   def booked?(start_time, end_time, current_time)
