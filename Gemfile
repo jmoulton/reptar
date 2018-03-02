@@ -9,6 +9,10 @@ gem 'foreman'
 gem 'google-api-client'
 gem 'pry'
 
+group :production do
+  gem 'puma'
+end
+
 group :development, :test do
   gem 'rake'
 end
