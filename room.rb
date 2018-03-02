@@ -30,15 +30,12 @@ class Room
   def room_occupied?(emoji)
     room = find_room(emoji)
     return false unless room.present?
-
-    calendar_id = room.resource_email
     room = find_room(emoji)
 
     events = room_events(room.resource_email)
     room = events.first
 
-    room.start.date_time.to_time.utc < (Time.now + 3.hours).utc &&
-      (Time.now + 3.hours).utc < room.end.date_time.to_time.utc
+    booked?(room.start.date_time, room.end.date_time, Time.now)
   end
 
   def find_room(emoji)
@@ -52,10 +49,15 @@ class Room
   end
 
   def by_name
-    @rooms.map! { |r| r.resource_name }
+    @rooms.map!(&:resource_name)
   end
 
   def stripped_floor
     @rooms.each { |r| r[0..2] = '' }
+  end
+
+  def booked?(start_time, end_time, current_time)
+    start_time < (current_time + 3.hours) &&
+      (current_time + 3.hours) < end_time
   end
 end
