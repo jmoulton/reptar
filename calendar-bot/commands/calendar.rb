@@ -37,28 +37,24 @@ module CalendarBot
       end
     end
 
-    command /list rooms/,
-      /list rooms on 24/,
-      /list rooms on 27/,
-      /list open rooms on 24/,
-      /list open rooms on 27/  do |client, data, match|
-        with_auth(client, data) do
-          service = GoogleServices.new(data['user'])
-          service.authorize
+    command(/list rooms/, /list rooms on 24/, /list rooms on 27/,
+            /list open rooms on 24/, /list open rooms on 27/)  do |client, data, match|
+      with_auth(client, data) do
+        service = GoogleServices.new(data['user'])
+        service.authorize
 
-          opts = {}
-          command = match.to_s
-          opts.merge!(on: '24') if /24/.match(command).present?
-          opts.merge!(on: '27') if /27/.match(command).present?
+        opts = {}
+        command = match.to_s
+        opts[:on] = '24' if /24/.match(command).present?
+        opts[:on] = '27' if /27/.match(command).present?
+        rooms = service.find_rooms(opts)
 
-          rooms = service.find_rooms(opts)
-
-          client.say(channel: data.channel, text: rooms)
-        end
+        client.say(channel: data.channel, text: rooms)
+      end
     end
 
-   command /is\s\:.+\:\savailable\?/ do |client, data, match|
-     with_auth(client, data) do
+    command(/is\s\:.+\:\savailable\?/) do |client, data, match|
+      with_auth(client, data) do
         service = GoogleServices.new(data['user'])
         service.authorize
 
@@ -68,31 +64,30 @@ module CalendarBot
         if available
           text = ":ohyeah: looks like that room is free! :dancing:"
         else
-          binding.pry
           events = calendar(data['user']).format!(service.room_events(emoji))
           text = "Bummer man! Looks like it's booked. Here are the upcoming events:\n#{events}"
         end
 
         client.say(channel: data.channel, text: text)
-     end
-   end
+      end
+    end
 
-   command /list events in \:.+\:/ do |client, data, match|
-     service = GoogleServices.new(data['user'])
-     service.authorize
+    command /list events in \:.+\:/ do |client, data, match|
+      service = GoogleServices.new(data['user'])
+      service.authorize
 
-     emoji = match.to_s.scan(/\:.+\:/).first
+      emoji = match.to_s.scan(/\:.+\:/).first
 
-     events = calendar(data['user']).format!(service.room_events(emoji))
+      events = calendar(data['user']).format!(service.room_events(emoji))
 
-     text = ":ohmy: here are the upcoming event times in #{emoji}\n#{events}"
+      text = ":ohmy: here are the upcoming event times in #{emoji}\n#{events}"
 
-     client.say(channel: data.channel, text: text)
-   end
+      client.say(channel: data.channel, text: text)
+    end
 
-   command 'who is reptar?' do |client, data, _match|
-     client.say(channel: data.channel, text: "https://www.youtube.com/watch?v=kLCmiVs_j7Y")
-   end
+    command 'who is reptar?' do |client, data, _match|
+      client.say(channel: data.channel, text: "https://www.youtube.com/watch?v=kLCmiVs_j7Y")
+    end
 
     match /\d{1}\/.+/ do |client, data, _match|
       calendar(data['user']).send_code(data["text"])
@@ -104,11 +99,8 @@ module CalendarBot
       GoogleCalendar.new(user)
     end
 
-    private
-
     def self.with_auth(client, data)
       yield
-
     rescue AuthorizationError
       text = "Oops! Looks like you're not authenticated. Try telling me: \"authorize me!\""
       client.say(channel: data.channel, text: text)

@@ -3,7 +3,7 @@ class GoogleCalendar
   require 'google-authorizer'
   require 'pry'
 
-  APPLICATION_NAME = 'Google Calendar API Ruby Quickstart'
+  APPLICATION_NAME = 'Reptar'.freeze
 
   def initialize(user)
     @user = user
@@ -27,29 +27,29 @@ class GoogleCalendar
 
   def fetch_most_recent_events(count = 10, calendar_id = 'primary')
     response = @service.list_events(calendar_id,
-                                   max_results: count,
-                                   single_events: true,
-                                   order_by: 'startTime',
-                                   time_min: Time.now.iso8601)
+                                    max_results: count,
+                                    single_events: true,
+                                    order_by: 'startTime',
+                                    time_min: Time.now.iso8601)
 
-    return "No upcoming events found" if response.items.empty?
+    return 'No upcoming events found' if response.items.empty?
 
-    return response.items
+    response.items
   end
 
   def format!(events)
-    str = "";
+    str = ''
     events.each do |event|
-      start = event.start.date || event.start.date_time
+      start = event.start.date_time
       start = start.strftime('from %I:%M%p to ')
-      end_time = event.end.date || event.end.date_time
+      end_time = event.end.date_time
       end_time = end_time.strftime('%I:%M%p on %m/%d/%Y')
 
       summary = event.summary.present? ? event.summary : 'Meeting'
-      str = str + "> *#{summary}* #{start}#{end_time}\n"
+      str += "> *#{summary}* #{start}#{end_time}\n"
     end
 
-    return str
+    str
   end
 
   private

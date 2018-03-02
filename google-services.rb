@@ -6,7 +6,7 @@ class GoogleServices
 
   require 'fileutils'
 
-  APPLICATION_NAME = 'Google Calendar API Ruby Quickstart'
+  APPLICATION_NAME = 'Reptar'.freeze
 
   def initialize(user)
     @user = user
@@ -53,7 +53,7 @@ class GoogleServices
       end
     end
 
-    rooms
+    rooms.by_name
   end
 
   private
