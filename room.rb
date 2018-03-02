@@ -30,7 +30,6 @@ class Room
   def room_occupied?(emoji)
     room = find_room(emoji)
     return false unless room.present?
-    room = find_room(emoji)
 
     events = room_events(room.resource_email)
     room = events.first
@@ -45,7 +44,7 @@ class Room
   end
 
   def room_events(calendar_id)
-    @calendar.fetch_most_recent_events(10, calendar_id)
+    @calendar.fetch_most_recent_events(5, calendar_id)
   end
 
   def by_name
@@ -57,7 +56,7 @@ class Room
   end
 
   def booked?(start_time, end_time, current_time)
-    start_time < (current_time + 3.hours) &&
-      (current_time + 3.hours) < end_time
+    start_time < current_time &&
+      current_time < end_time
   end
 end

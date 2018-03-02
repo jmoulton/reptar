@@ -62,10 +62,10 @@ module CalendarBot
         available = service.room_available?(emoji)
 
         if available
-          text = ":ohyeah: looks like that room is free! :dancing:"
+          text = ':ohyeah: looks like that room is free! :dancing:'
         else
           events = calendar(data['user']).format!(service.room_events(emoji))
-          text = "Bummer man! Looks like it's booked. Here are the upcoming events:\n#{events}"
+          text = "Bummer :dude:! Looks like it's booked. Here are the upcoming events:\n#{events}"
         end
 
         client.say(channel: data.channel, text: text)
